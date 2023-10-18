@@ -30,6 +30,13 @@ segments = []
 
 score = 0
 
+score_display = turtle.Turtle()
+score_display.speed(0)
+score_display.color("white")
+score_display.penup()
+score_display.hideturtle()
+score_display.goto(0, 260)
+
 def move():
     if head.direction == "up":
         y = head.ycor()
@@ -100,8 +107,12 @@ def check_collision():
     return False
 
 def update_screen():
-    global score
+    global score, high_score
     if check_collision():
+        if score > high_score:
+            high_score = score
+            update_high_score_display()
+            save_high_score(high_score)
         score_display.clear()
         score_display.write(f"Score: {score}", align="center", font=("Courier", 24, "normal"))
         head.goto(0, 0)
@@ -138,18 +149,34 @@ def start_new_game():
     head.color(random_color())
     food.color("red")
 
-score_display = turtle.Turtle()
-score_display.speed(0)
-score_display.color("white")
-score_display.penup()
-score_display.hideturtle()
-score_display.goto(0, 260)
-update_score_display()
+def load_high_score():
+    try:
+        with open("high_score.txt", "r") as file:
+            return int(file.read())
+    except FileNotFoundError:
+        return 0
+
+def save_high_score(score):
+    with open("high_score.txt", "w") as file:
+        file.write(str(score))
+
+high_score = load_high_score()
+
+high_score_display = turtle.Turtle()
+high_score_display.speed(0)
+high_score_display.color("white")
+high_score_display.penup()
+high_score_display.hideturtle()
+high_score_display.goto(-280, 260)
+
+def update_high_score_display():
+    high_score_display.clear()
+    high_score_display.write(f"High Score: {high_score}", align="left", font=("Courier", 12, "normal"))
+
+update_high_score_display()
 
 while True:
     screen.update()
     update_screen()
 
 turtle.done()
-
-
